@@ -1,0 +1,82 @@
+Note: flex 2.5.33 or greater is required (need support for %option noyyalloc noyyfree noyyrealloc)
+
+To build:
+
+make
+make install  # Note: You might have to be a privileged user to do this
+
+(Note: set DONT_USE_PGXS before calling make if you don't want to use pgxs for
+the build. If you don't know what this means, you should probably just ignore
+it.)
+
+-- restart postgresql
+
+DROP FUNCTION PL_LOLCODE_CALL_HANDLER() CASCADE;
+
+-- For 8.2:
+
+INSERT INTO pg_pltemplate (
+    tmplname,
+    tmpltrusted,
+    tmplhandler,
+    tmpllibrary
+)
+VALUES (
+    'pllolcode',
+    't',
+    'pl_lolcode_call_handler',
+    '$libdir/pllolcode'
+);
+
+-- For 8.3:
+
+INSERT INTO pg_pltemplate (
+    tmplname,
+    tmpltrusted,
+    tmpldbacreate,
+    tmplhandler,
+    tmpllibrary
+)
+VALUES (
+    'pllolcode',
+    't',
+    't',
+    'pl_lolcode_call_handler',
+    '$libdir/pllolcode'
+);
+
+CREATE LANGUAGE PLLOLCODE;
+
+-- Sample function: 
+
+CREATE FUNCTION LOL_MAIN_TEST(TEXT)
+RETURNS BOOLEAN
+LANGUAGE PLLOLCODE
+AS $$
+HAI
+     VISIBLE INFO LOL1
+     FOUND YR WIN
+KTHXBYE
+$$;
+
+SELECT LOL_MAIN_TEST('IM IN YR DATABUKKIT');
+
+/*
+INFO:  IM IN YR DATABUKKIT
+ lol_main_test 
+ ---------------
+  t
+  (1 row)
+*/
+
+Notes:
+
+- PL/LOLCODE aims to implement the LOLCODE 1.2 spec, at least at the time of
+  this writing
+- Note as in the sample function above, boolean values (TROOF values, in
+  LOLCODE parlance) are WIN (true) and FAIL (false)
+- Arguments passed to a function are available with the special PL/LOLCODE
+  variables LOL1, LOL2, etc.
+- The VISIBLE command corresponds to RAISE in pl/pgsql. It can optionally take
+  values of INFO, NOTICE, etc. (just like RAISE) to indicate the desired log
+  level.
