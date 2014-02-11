@@ -6,6 +6,7 @@
  /* TODO: Add function line numbers to error messages */
 
 #include "pllolcode.h"
+#include "access/htup_details.h"
 #include "executor/spi.h"
 #include "commands/trigger.h"
 #include "fmgr.h"
