@@ -280,6 +280,9 @@ pl_lolcode_validator(PG_FUNCTION_ARGS) {
     bool isnull;
     int parseres;
 
+    if (!CheckFunctionValidatorAccess(fcinfo->flinfo->fn_oid, procoid))                                             
+            PG_RETURN_VOID();                                                                                       
+
     /* Must get the proc tuple, then proc source */
     /* Get procedure tuple */
     procTup = SearchSysCache(PROCOID, procoid, 0, 0, 0);
